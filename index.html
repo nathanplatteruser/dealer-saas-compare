@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<title>Dealer SaaS compare (Beakon / Lot tools)</title>
+<style>
+:root {
+  --bg:#0c1118; --panel:#162032; --border:#2a3a50; --text:#e8eef7; --muted:#93a4bd;
+  --accent:#4da3ff; --chip:#1e2c40; --on:#2d6cdf; --ok:#3ecf8e; --warn:#f0a020;
+}
+* { box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+body {
+  margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif;
+  background:var(--bg); color:var(--text); line-height:1.4;
+  padding: max(12px, env(safe-area-inset-top)) 12px 80px;
+}
+h1 { font-size:1.25rem; margin:0 0 6px; letter-spacing:-.02em; }
+.sub { color:var(--muted); font-size:.9rem; margin:0 0 12px; }
+.banner {
+  background:#1a2838; border:1px solid var(--border); border-radius:12px;
+  padding:10px 12px; font-size:.85rem; color:var(--muted); margin-bottom:12px;
+}
+.banner strong { color:var(--warn); }
+.sticky {
+  position:sticky; top:0; z-index:20; background:rgba(12,17,24,.94);
+  backdrop-filter: blur(10px); padding:8px 0 10px; margin:0 -12px; padding-left:12px; padding-right:12px;
+  border-bottom:1px solid var(--border);
+}
+.row { display:flex; gap:8px; overflow-x:auto; -webkit-overflow-scrolling:touch; padding-bottom:6px; }
+.chip {
+  flex:0 0 auto; min-height:44px; padding:10px 14px; border-radius:999px;
+  border:1px solid var(--border); background:var(--chip); color:var(--text);
+  font-size:.9rem; font-weight:600; cursor:pointer; user-select:none;
+}
+.chip.on { background:var(--on); border-color:#5b9fd4; }
+.search {
+  width:100%; min-height:44px; margin:8px 0 0; padding:10px 12px;
+  border-radius:10px; border:1px solid var(--border); background:var(--panel); color:var(--text); font-size:16px;
+}
+.slider-wrap { margin-top:10px; }
+.slider-wrap label { display:flex; justify-content:space-between; font-size:.85rem; color:var(--muted); }
+input[type=range] { width:100%; height:36px; }
+.count { font-size:.85rem; color:var(--muted); margin:10px 0; }
+.tabs { display:flex; gap:8px; margin:8px 0 12px; }
+.tab {
+  flex:1; min-height:44px; border-radius:10px; border:1px solid var(--border);
+  background:var(--panel); color:var(--text); font-weight:650; cursor:pointer;
+}
+.tab.on { background:var(--on); border-color:#5b9fd4; }
+.cards { display:grid; gap:12px; }
+@media (min-width:900px) { .cards { grid-template-columns: 1fr 1fr; } }
+.card {
+  background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:14px;
+}
+.card h2 { margin:0 0 4px; font-size:1.1rem; }
+.aka { color:var(--accent); font-size:.8rem; font-weight:600; margin-bottom:6px; }
+.pitch { margin:0 0 10px; font-size:.95rem; }
+.meta { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
+.pill { font-size:.75rem; padding:4px 8px; border-radius:999px; border:1px solid var(--border); color:var(--muted); }
+.pill.job { color:#cde4ff; border-color:#3a5a80; }
+.pill.price { color:#d7ffe9; border-color:#2d6a4f; }
+ul { margin:6px 0 10px 18px; padding:0; font-size:.9rem; }
+.section { font-size:.75rem; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); margin:8px 0 4px; font-weight:700; }
+.links { display:flex; flex-direction:column; gap:8px; }
+.links a {
+  display:flex; align-items:center; justify-content:center; min-height:44px;
+  border-radius:10px; background:#203044; color:#fff; text-decoration:none; font-weight:650; font-size:.9rem;
+  border:1px solid var(--border);
+}
+.links a.primary { background:var(--on); }
+.hidden { display:none !important; }
+.detail { display:none; }
+.detail.show { display:block; }
+.grid-detail { display:none; }
+body.mode-table .cards { display:none; }
+body.mode-table .grid-detail { display:block; overflow-x:auto; }
+table { width:100%; border-collapse:collapse; font-size:.82rem; background:var(--panel); border-radius:12px; overflow:hidden; }
+th,td { padding:10px; border-bottom:1px solid var(--border); text-align:left; vertical-align:top; }
+th { background:#101826; color:var(--muted); position:sticky; top:0; }
+footer { margin-top:24px; color:var(--muted); font-size:.8rem; }
+</style>
+</head>
+<body>
+  <h1>Dealer SaaS click-board</h1>
+  <p class="sub">Beakon (lot GPS / recon) + LotPilot, LotDesk, Aerolot, CARVID, Quantum. Phone + Chrome.</p>
+  <div class="banner"><strong>Lane note:</strong> Nathan products stay Marketplace Copilot + SettleUp only. <strong>No dealership SKU.</strong> This board is competitive look-around, not a build ticket.</div>
+
+  <div class="sticky">
+    <div class="tabs">
+      <button class="tab on" data-view="cards" type="button">Cards</button>
+      <button class="tab" data-view="table" type="button">Table</button>
+    </div>
+    <div class="row" id="jobChips">
+      <button class="chip on" data-job="" type="button">All jobs</button>
+      <button class="chip" data-job="ops" type="button">Lot / recon</button>
+      <button class="chip" data-job="sales" type="button">Sales / BDC</button>
+      <button class="chip" data-job="marketplace" type="button">Marketplace</button>
+      <button class="chip" data-job="os" type="button">Full OS</button>
+    </div>
+    <input class="search" id="q" type="search" placeholder="Search name, pitch, feature…" enterkeyhint="search"/>
+    <div class="slider-wrap">
+      <label><span>Max monthly price (known)</span><span id="priceLabel">Any</span></label>
+      <input type="range" id="price" min="0" max="1000" step="50" value="1000"/>
+    </div>
+  </div>
+  <div class="count">Showing <b id="vis">0</b></div>
+  <div class="cards" id="cards"></div>
+  <div class="grid-detail">
+    <table>
+      <thead><tr><th>Product</th><th>Job</th><th>Price</th><th>Pitch</th><th>Open</th></tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+  <footer>Built for Nathan · sources: beakon.app, lotpilot.com, lotdesk.mir.digital, aerolot.ai, prior Marketplace research. Verify live pricing before decisions.</footer>
+<script>
+const PRODUCTS = [{"id": "beakon", "name": "Beakon", "aka": "Likely what you meant by Lot Beacon", "pitch": "Reconditioning + GPS lot tracking so dealers stop hunting cars and chasing vendors.", "job": "Ops / recon / lot location", "price_min": 895, "price_max": 995, "price_note": "$895/mo annual or $995/mo monthly per dealership", "features": ["8-phase recon tracking (trade-in to front line)", "GPS lot map via phone (no hardware tags)", "Mobile VIN scan + NHTSA pull", "Vendor messaging + photo proof", "Bottleneck alerts + auto invoicing"], "pros": ["Clear lot-search ROI story", "No RFID hardware", "Mobile-first recon"], "cons": ["Recon/ops not BDC/sales AI", "Premium price vs Marketplace tools", "Early-stage vendor"], "links": [["Home / sales", "https://beakon.app/"], ["GPS lot tracking guide", "https://beakon.app/features/gps-lot-tracking"], ["LinkedIn", "https://www.linkedin.com/company/beakon-app"]], "tags": ["recon", "gps", "ops"]}, {"id": "lotpilot", "name": "LotPilot", "aka": "AI sales machine for the lot", "pitch": "DMS sync, Marketplace/Craigslist post, AI SMS/voice that books test drives.", "job": "Inbound sales / BDC AI", "price_min": 0, "price_max": 0, "price_note": "One-plan messaging on site (confirm live pricing)", "features": ["DMS inventory sync", "Auto-post Marketplace + Craigslist", "AI SMS + voice lead handling", "Test-drive calendar booking", "Analytics dashboard"], "pros": ["Closest to lead\u2192appointment loop", "Marketplace posting for dealers"], "cons": ["Pricing opaque on homepage", "Full-auto AI vs HITL taste"], "links": [["Home / sales", "http://www.lotpilot.com/"]], "tags": ["sales", "marketplace", "ai"]}, {"id": "lotdesk", "name": "LotDesk", "aka": "AI BDC for used-car stores", "pitch": "Lead-to-lot OS: qualify, match inventory, book showed drives, push into DealerSocket/VinSolutions.", "job": "BDC / CRM fill", "price_min": 0, "price_max": 0, "price_note": "Pilot + $ per kept test drive (performance priced)", "features": ["AI qualify budget / finance / trade", "Live inventory match", "Showed-appointment CRM writeback", "Portal spend attribution (group tier)", "30-day pilot positioning"], "pros": ["Pays on showed drives", "CRM two-way story"], "cons": ["Used-car BDC niche", "Not recon/GPS"], "links": [["Home / sales", "https://lotdesk.mir.digital/"]], "tags": ["sales", "bdc", "crm"]}, {"id": "aerolot", "name": "Aerolot", "aka": "Dealership OS for independents", "pitch": "Website + CRM + inventory + Deal Desk/F&I + Aero AI co-pilot in one OS.", "job": "Full store OS", "price_min": 0, "price_max": 0, "price_note": "Pricing via sales (confirm)", "features": ["CRM tied to inventory + F&I", "Deal Desk / desking", "Autopilot busywork", "Aero AI on live store data", "Website connect options"], "pros": ["Broad independent-dealer OS", "F&I depth"], "cons": ["Heavier than a lot tracker", "Not Marketplace-specialist"], "links": [["Home / sales", "https://www.aerolot.ai/"]], "tags": ["os", "crm", "fi"]}, {"id": "carvid", "name": "CARVID", "aka": "Dealer Marketplace stack", "pitch": "DMS\u2192Marketplace auto-post + AI Messenger + ADF CRM leads for rooftops.", "job": "Marketplace + dealer CRM", "price_min": 249, "price_max": 799, "price_note": "Starter $249 \u00b7 Growth $499 \u00b7 Enterprise $799 /mo (Research 2026-09-05)", "features": ["HomeNet / DealerCenter / vAuto sync", "Daily Marketplace posting", "AI Messenger with VIN context", "Test-drive booking", "ADF lead to dealer CRM"], "pros": ["Priced publicly", "Marketplace-native for dealers"], "cons": ["Wrong ICP for Marketplace Copilot", "6\u00d7 flipper tools"], "links": [["Search CARVID", "https://www.google.com/search?q=CARVID+Facebook+Marketplace+dealer"]], "tags": ["marketplace", "dealer", "dms"]}, {"id": "quantum", "name": "Quantum Connect AI", "aka": "Dealer Marketplace AI (verify)", "pitch": "Auto-dealer Messenger AI + appointments + CRM pipeline (compare cites ~$199\u2013$299).", "job": "Marketplace + appointments", "price_min": 199, "price_max": 299, "price_note": "~$199 / $299 compare cites \u2014 verify on vendor site", "features": ["Messenger AI for dealers", "Appointment booking", "CRM pipeline handoff"], "pros": ["Dealer price band known in comps"], "cons": ["Verify live pricing", "Adjacent not Nathan ICP"], "links": [["Search Quantum Connect AI", "https://www.google.com/search?q=Quantum+Connect+AI+dealer+Marketplace"]], "tags": ["marketplace", "ai", "dealer"]}];
+let job = "";
+let priceMax = 1000;
+
+function match(p) {
+  const q = (document.getElementById('q').value || '').toLowerCase();
+  const text = (p.name + ' ' + p.aka + ' ' + p.pitch + ' ' + p.job + ' ' + p.features.join(' ') + ' ' + p.tags.join(' ')).toLowerCase();
+  if (q && !text.includes(q)) return false;
+  if (job === 'ops' && !(p.tags.includes('recon') || p.tags.includes('gps') || p.tags.includes('ops'))) return false;
+  if (job === 'sales' && !(p.tags.includes('sales') || p.tags.includes('bdc') || p.tags.includes('crm'))) return false;
+  if (job === 'marketplace' && !p.tags.includes('marketplace')) return false;
+  if (job === 'os' && !(p.tags.includes('os') || p.tags.includes('fi'))) return false;
+  // price filter: unknown (0) always show unless slider under 200 wanting only cheap known
+  if (p.price_min > 0 && p.price_min > priceMax) return false;
+  if (p.price_max > 0 && p.price_min === 0 && p.price_max > priceMax) return false;
+  if (p.price_min > 0 && p.price_max > 0 && p.price_min > priceMax) return false;
+  return true;
+}
+
+function render() {
+  const cards = document.getElementById('cards');
+  const tbody = document.getElementById('tbody');
+  cards.innerHTML = '';
+  tbody.innerHTML = '';
+  let n = 0;
+  PRODUCTS.forEach(p => {
+    if (!match(p)) return;
+    n++;
+    const links = p.links.map((l,i) => `<a class="${i===0?'primary':''}" href="${l[1]}" target="_blank" rel="noopener">${l[0]}</a>`).join('');
+    const el = document.createElement('article');
+    el.className = 'card';
+    el.innerHTML = `
+      <div class="aka">${p.aka}</div>
+      <h2>${p.name}</h2>
+      <p class="pitch">${p.pitch}</p>
+      <div class="meta">
+        <span class="pill job">${p.job}</span>
+        <span class="pill price">${p.price_note}</span>
+      </div>
+      <div class="section">Features</div>
+      <ul>${p.features.map(f=>`<li>${f}</li>`).join('')}</ul>
+      <div class="section">Pros</div>
+      <ul>${p.pros.map(f=>`<li>${f}</li>`).join('')}</ul>
+      <div class="section">Cons</div>
+      <ul>${p.cons.map(f=>`<li>${f}</li>`).join('')}</ul>
+      <div class="section">Open pages</div>
+      <div class="links">${links}</div>`;
+    cards.appendChild(el);
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td><b>${p.name}</b><br><span style="color:#93a4bd">${p.aka}</span></td>
+      <td>${p.job}</td><td>${p.price_note}</td><td>${p.pitch}</td>
+      <td><a href="${p.links[0][1]}" target="_blank" rel="noopener">Sales page</a></td>`;
+    tbody.appendChild(tr);
+  });
+  document.getElementById('vis').textContent = n;
+}
+
+document.getElementById('jobChips').addEventListener('click', (e) => {
+  const b = e.target.closest('.chip');
+  if (!b) return;
+  document.querySelectorAll('#jobChips .chip').forEach(c => c.classList.remove('on'));
+  b.classList.add('on');
+  job = b.dataset.job || '';
+  render();
+});
+document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => {
+  document.querySelectorAll('.tab').forEach(x => x.classList.remove('on'));
+  t.classList.add('on');
+  document.body.classList.toggle('mode-table', t.dataset.view === 'table');
+}));
+document.getElementById('q').addEventListener('input', render);
+const price = document.getElementById('price');
+const priceLabel = document.getElementById('priceLabel');
+price.addEventListener('input', () => {
+  priceMax = +price.value;
+  priceLabel.textContent = priceMax >= 1000 ? 'Any' : ('≤ $' + priceMax + '/mo');
+  render();
+});
+render();
+</script>
+</body>
+</html>
